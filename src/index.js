@@ -8,6 +8,7 @@ const app = server.listen(port, (err) => {
     process.exit(1);
   } else {
     logger.info(`Server runs at port ${port} in ${env} environment`);
+
   }
 });
 

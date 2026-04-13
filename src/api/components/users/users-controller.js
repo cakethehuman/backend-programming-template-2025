@@ -1,6 +1,92 @@
+/* eslint-disable prettier/prettier */
+const { json } = require('body-parser');
 const usersService = require('./users-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 const { hashPassword } = require('../../../utils/password');
+
+async function getPrizes(request, response, next) {
+  try {
+    const prizes = await usersService.getPrizes();
+
+    return response.status(200).json(prizes);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// liat history dari id
+async function getHistoryId(request, response, next) {
+  try {
+    const userId = await usersService.getHistoryId(request.params.id);
+
+    return response.status(200).json(userId);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function getHistory(request, response, next) {
+  try {
+    const history = await usersService.getHistory();
+    for (let i = 0; i < history.length; i++) {
+      
+      const arrName = history[i].fullName.split('');
+
+      for(let j = 0; j < history[i].fullName.length/2; j++){
+          const randomNumber = Math.floor(Math.random() * history[i].fullName.length);
+          arrName[randomNumber] = "*";
+      }
+
+      history[i].fullName = arrName.join('');
+    }
+    return response.status(200).json(history);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function gacha(request, response, next) {
+  try {
+    const user = await usersService.getUser(request.body.userId);
+
+    if (!user) {
+      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'User not found');
+    }
+    const today = new Date().toDateString();
+
+    if (user.lastGachaDate !== today) {
+      user.remainingQuotaUser = 5;
+      user.lastGachaDate = today;
+      await user.save();
+    }
+
+    if (user.remainingQuotaUser === 0) {
+      return response
+        .status(400)
+        .json({ message: 'Quota user telah habis tunggu besok' });
+    }
+    await usersService.subUser(request.body.userId);
+    const hasil = await usersService.gacha();
+    const gachaDapetApa = Math.floor(Math.random() * 10);
+
+    if (gachaDapetApa > 3) {
+      const nomorRandom = Math.floor(Math.random() * hasil.length);
+      await usersService.subPrize(hasil[nomorRandom]._id);
+      // for display karena shownya 500 padahal udah 499
+      hasil[nomorRandom].remainingQuota -= 1;
+      await usersService.gachaHistory(
+        user._id,
+        user.fullName,
+        hasil[nomorRandom].name
+      );
+      return response.status(200).json(hasil[nomorRandom]);
+    }
+    await usersService.gachaHistory(user._id, user.fullName, 'ZONK');
+    return response.status(200).json({ message: 'ZONK' });
+  } catch (error) {
+    return next(error);
+  }
+}
 
 async function getUsers(request, response, next) {
   try {
@@ -33,6 +119,8 @@ async function createUser(request, response, next) {
       password,
       full_name: fullName,
       confirm_password: confirmPassword,
+      remainingQuotaUser,
+      lastGachaDate,
     } = request.body;
 
     // Email is required and cannot be empty
@@ -79,7 +167,9 @@ async function createUser(request, response, next) {
     const success = await usersService.createUser(
       email,
       hashedPassword,
-      fullName
+      fullName,
+      remainingQuotaUser,
+      lastGachaDate
     );
 
     if (!success) {
@@ -198,4 +288,8 @@ module.exports = {
   updateUser,
   changePassword,
   deleteUser,
+  gacha,
+  getHistoryId,
+  getPrizes,
+  getHistory,
 };

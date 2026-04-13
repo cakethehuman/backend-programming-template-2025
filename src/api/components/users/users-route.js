@@ -13,6 +13,18 @@ module.exports = (app) => {
   // Create a new user
   route.post('/', usersController.createUser);
 
+  // User spin
+  route.post('/gacha', usersController.gacha);
+
+  // See gacha history based on user id
+  route.get('/:id/history', usersController.getHistoryId);
+
+  // liat sisa prize
+  route.get('/prizes', usersController.getPrizes);
+
+  // see history for all the winners
+  route.get('/history', usersController.getHistory)
+  
   // Get user detail
   route.get('/:id', usersController.getUser);
 
