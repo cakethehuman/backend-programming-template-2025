@@ -5,12 +5,7 @@ module.exports = (db) =>
       email: String,
       password: String,
       fullName: String,
-      remainingQuotaUser: {
-        type : Number,
-        default : 5
-      },lastGachaDate: {
-        type: Date,
-        default: null
-      },
+      remainingQuotaUser: Number,
+      lastGachaDate: Date
     })
   );
