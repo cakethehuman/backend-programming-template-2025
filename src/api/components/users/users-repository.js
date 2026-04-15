@@ -2,6 +2,11 @@ const { Users } = require('../../../models');
 const { Prize } = require('../../../models');
 const { History } = require('../../../models');
 
+// see only hasil gacha history
+async function getGachaHistory() {
+  return History.find({});
+}
+
 // see history
 async function getHistory() {
   return History.find({});
@@ -94,4 +99,5 @@ module.exports = {
   getHistoryId,
   getPrizes,
   getHistory,
+  getGachaHistory,
 };

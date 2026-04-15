@@ -4,6 +4,19 @@ const usersService = require('./users-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 const { hashPassword } = require('../../../utils/password');
 
+async function getGachaHistory(request, response, next) {
+  try {
+    const history = await usersService.getGachaHistory();
+    const hasil = [];
+    for (let i = 0; i < history.length; i++) {
+      hasil.push({ 'Hasil gacha': history[i].ItemWon });
+    }
+    return response.status(200).json(hasil);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function getPrizes(request, response, next) {
   try {
     const prizes = await usersService.getPrizes();
@@ -305,4 +318,5 @@ module.exports = {
   getHistoryId,
   getPrizes,
   getHistory,
+  getGachaHistory,
 };

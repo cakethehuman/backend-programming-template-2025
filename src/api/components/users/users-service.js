@@ -1,7 +1,11 @@
 const usersRepository = require('./users-repository');
 
+async function getGachaHistory() {
+  return usersRepository.getGachaHistory();
+}
+
 async function getHistory() {
-  return usersRepository.getHistory()
+  return usersRepository.getHistory();
 }
 
 async function getPrizes() {
@@ -78,4 +82,5 @@ module.exports = {
   getHistoryId,
   getPrizes,
   getHistory,
+  getGachaHistory,
 };

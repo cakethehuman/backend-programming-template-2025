@@ -23,7 +23,10 @@ module.exports = (app) => {
   route.get('/prizes', usersController.getPrizes);
 
   // see history for all the winners
-  route.get('/history', usersController.getHistory)
+  route.get('/history', usersController.getGachaHistory)
+
+  // see history for all the winners
+  route.get('/history/winners', usersController.getHistory)
   
   // Get user detail
   route.get('/:id', usersController.getUser);
