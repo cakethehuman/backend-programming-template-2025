@@ -14,7 +14,7 @@ module.exports = (app) => {
   route.post('/', usersController.createUser);
 
   // User spin
-  route.get('/:id/gacha', usersController.gacha);
+  route.post('/gacha', usersController.gacha);
 
   // See gacha history based on user id
   route.get('/:id/history', usersController.getHistoryId);

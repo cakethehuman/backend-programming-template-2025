@@ -71,7 +71,7 @@ async function getHistory(request, response, next) {
 
 async function gacha(request, response, next) {
   try {
-    const user = await usersService.getUser(request.params.id);
+    const user = await usersService.getUser(request.body.id);
 
     if (!user) {
       throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'User not found');
