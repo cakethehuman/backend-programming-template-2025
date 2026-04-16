@@ -31,15 +31,15 @@ async function getPrizes(request, response, next) {
 async function getHistoryId(request, response, next) {
   try {
     const history = await usersService.getHistoryId(request.params.id);
-    const itemsDict = {};
+    let itemsDict = {};
     for (let i = 0; i < history.length; i++) {
-      if (!(history[i].ItemWon in itemsDict)) {
+      if (!(history[i].ItemWon in itemsDict) && history[i].ItemWon !== 'ZONK') {
         itemsDict[history[i].ItemWon] = 1;
       } else {
         itemsDict[history[i].ItemWon] += 1;
       }
     }
-
+    delete itemsDict["ZONK"];
     return response
       .status(200)
       .json({ 'Kamu pernah menang': itemsDict, 'History gacha': history });
@@ -76,11 +76,12 @@ async function gacha(request, response, next) {
     if (!user) {
       throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'User not found');
     }
-    const today = new Date().toDateString();
+    const today = new Date().toISOString().split('T')[0];
+    const lastDate = new Date(user.lastGachaDate).toISOString().split('T')[0];
 
-    if (user.lastGachaDate !== today) {
+    if (lastDate !== today) {
       user.remainingQuotaUser = 5;
-      user.lastGachaDate = today;
+      user.lastGachaDate = new Date();
       await user.save();
     }
 
@@ -89,7 +90,8 @@ async function gacha(request, response, next) {
         .status(400)
         .json({ message: 'Quota user telah habis tunggu besok' });
     }
-    await usersService.subUser(request.body.userId);
+    await usersService.subUser(request.body.id);
+
     const hasil = await usersService.gacha();
     const gachaDapetApa = Math.floor(Math.random() * 10);
 

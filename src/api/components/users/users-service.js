@@ -12,8 +12,8 @@ async function getPrizes() {
   return usersRepository.getPrizes();
 }
 
-async function getHistoryId(userId) {
-  return usersRepository.getHistoryId(userId);
+async function getHistoryId(id) {
+  return usersRepository.getHistoryId(id);
 }
 
 async function gacha() {

@@ -7,9 +7,9 @@ async function getGachaHistory() {
   return History.find({});
 }
 
-// see history
+// see history winners
 async function getHistory() {
-  return History.find({});
+  return History.find({ ItemWon: { $ne: 'ZONK' } });
 }
 
 // see price list
@@ -18,8 +18,8 @@ async function getPrizes() {
 }
 
 // liat history user di id
-async function getHistoryId(userId) {
-  return History.find({ UserId: userId });
+async function getHistoryId(id) {
+  return History.find({ UserId: id });
 }
 
 // untuk gacha dan check remaning quota
